@@ -4,8 +4,8 @@ public enum Suit {
     Diamond('◆', 3),
     Heart('♥',2);
 
-    private char value;
-    private int score;
+    private final char value;
+    private final int score;
     private Suit(char value, int score) {
         this.value = value;
         this.score = score;
