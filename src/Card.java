@@ -14,7 +14,7 @@ public class Card {
     }
 
     public String toString() {
-        return suit.getValue()+rank.name();
+        return suit.getSuit()+rank.name();
     }
 
 

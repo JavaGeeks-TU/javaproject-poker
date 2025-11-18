@@ -4,14 +4,14 @@ public enum Suit {
     Diamond('◆', 3),
     Heart('♥',2);
 
-    private final char value;
+    private final char suit;
     private final int score;
     private Suit(char value, int score) {
-        this.value = value;
+        this.suit = value;
         this.score = score;
     }
-    public char getValue() {
-        return value;
+    public char getSuit() {
+        return suit;
     }
     public int getScore() {
         return score;
