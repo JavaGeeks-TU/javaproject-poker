@@ -1,11 +1,14 @@
 public class Card {
+    //Rank 및 Suit 가져오기
     private final Rank rank;
     private final Suit suit;
 
+    //생성자
     public Card(Rank rank, Suit suit) {
         this.rank = rank;
         this.suit = suit;
     }
+    //rank와 suit 값 가져오기
     public Rank getRank() {
         return rank;
     }
@@ -13,6 +16,7 @@ public class Card {
         return suit;
     }
 
+    //깔끔하게 출력 해주기
     public String toString() {
         return suit.getSuit()+rank.name();
     }

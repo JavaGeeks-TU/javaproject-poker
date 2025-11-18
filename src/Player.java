@@ -1,7 +1,6 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class player {
+public class Player {
     private String name;          //플레이어 이름
     private int chips;            //현재 칩 보유량
     private boolean folded;       //이번 라운드에서 폴드했는가?
