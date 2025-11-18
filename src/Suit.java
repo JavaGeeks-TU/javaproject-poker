@@ -1,4 +1,5 @@
 public enum Suit {
+    //문양, 값
     Spade('♠', 4),
     Club('♣',1),
     Diamond('◆', 3),
