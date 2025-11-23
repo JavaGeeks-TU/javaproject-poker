@@ -1,5 +1,6 @@
 public enum Suit {
     //문양, 값
+    // 문양에 값은 필요 없음. 수정 바람.
     Spade('♠', 4),
     Club('♣',1),
     Diamond('◆', 3),

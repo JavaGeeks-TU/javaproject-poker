@@ -17,6 +17,7 @@ public class Card {
     }
 
     //깔끔하게 출력 해주기
+    // 오버라이드 붙이던지~
     public String toString() {
         return suit.getSuit()+rank.name();
     }

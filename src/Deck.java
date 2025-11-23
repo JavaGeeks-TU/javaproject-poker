@@ -2,6 +2,8 @@ import java.util.*;
 
 public class Deck {
     //arraylist 덱 생성
+    // 좋은 습관 = ArrayList (X) / List (O) 
+    // 최대한 추상적인 인터페이스를 사용하자
     ArrayList<Card> deck;
 
     //생성자
