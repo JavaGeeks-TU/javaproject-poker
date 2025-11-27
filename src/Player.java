@@ -4,15 +4,21 @@ public interface Player {
 
     String getName();
     int getChips();
-    int getCurrentBet();
-    List<Card> getHand();
+    void addChips(int amount);
+    void deductChips(int amount);
 
-    void receiveCard(Card card);
-    void resetHand();
-    void bet(int amount);
-    void call(int highestBet);
-    void fold();
+    Card[] getHoleCards();
+    void setHoldCards(Card c1, Card c2);
+
     boolean isFolded();
+    void fold();
 
-    String takeAction(List<Card> cards communityCards, int currentBet, int pot);
+    //액션 메서드
+    int bet(int amount);  //Bet or Raise
+    int call(int amount); //Call
+    void check();         //Check
+    int allin();          //All in
+
+    //현재 턴에 어떤 액션을 할지 결정
+    int takeAction(int currentBet, int pot, List<Card> communityCards);
 }
