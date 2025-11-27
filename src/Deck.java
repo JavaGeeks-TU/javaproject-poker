@@ -4,7 +4,7 @@ public class Deck {
     //arraylist 덱 생성
     // 좋은 습관 = ArrayList (X) / List (O) 
     // 최대한 추상적인 인터페이스를 사용하자
-    ArrayList<Card> deck;
+    private List<Card> deck;
 
     //생성자
     public Deck() {
@@ -17,5 +17,11 @@ public class Deck {
         }
         //섞기
         Collections.shuffle(deck);
+    }
+
+    public Card drawCard() {
+        if(deck.isEmpty())
+            return null;
+        return deck.remove(0);
     }
 }
