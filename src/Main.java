@@ -19,6 +19,9 @@ public class Main {
         }
         p.printcard(hands);
         p.printcard(pot);
+
         System.out.print(r.hankRanking(hands, pot).getName());
+        System.out.println();
+        hands.addAll(pot);
     }
 }

@@ -5,25 +5,7 @@ public class Rules {
     private List<Card> cards;
 
     public HandRanking hankRanking(List<Card> h, List<Card> p){
-        this.cardlist(h,p);
-        if (IsFour(this.cards)){
-            return HandRanking.FourCard;
-        }
-        else if (IsFullhouse(this.cards)) {
-            return HandRanking.FullHouse;
-        }
-        else if(IsF(this.cards)) {
-            return HandRanking.Flush;
-        }
-        else if(IsTriple(this.cards)) {
-            return HandRanking.Triple;
-        }
-        else if(IsTwoPair(this.cards)) {
-            return HandRanking.TwoPair;
-        }
-        else if(IsPair(this.cards)) {
-            return HandRanking.OnePair;
-        }
+        cardlist(h,p);
         return HandRanking.HighCard;
     }
     private void cardlist(List<Card> handcards, List<Card> potcard){
@@ -43,94 +25,110 @@ public class Rules {
         this.cards=card;
     }
 
-    public boolean IsF (List<Card> cards) {
-        int num = 0;
-        for (int i = 0; i < cards.size() - 1; i++) {
-            Card card1 = cards.get(i);
-            Card card2 = cards.get(i + 1);
-            if (card1.getSuit().getSuit() == card2.getSuit().getSuit()) {
-                num++;
+    private Optional<HandRank> IsF (List<Card> cards) {
+        cards = cards.stream().sorted(Comparator.comparing(Card::getSuit)).toList();
+        for(int i =0; i<3;i++){
+            if(cards.get(i).getSuit()==cards.get(i+4).getSuit()){
+                List<Card> c = cards.subList(i,i+4);
+                c = c.stream().sorted(Comparator.comparing(Card::getRank)).toList();
+                return Optional.of(new HandRank(cards ,c, HandRanking.Flush));
             }
         }
-        if (num>5){
-            return true;
-        }
-        else return false;
+        return Optional.empty();
     }
 
-    public boolean IsPair (List<Card> cards){
+    private Optional<HandRank> IsPair (List<Card> cards){
         int num = 0;
-        for(int i = 0; i < cards.size() - 1; i++){
-            Card card1 = cards.get(i);
-            Card card2 = cards.get(i + 1);
-            if(card1.getRank().getValue() == card2.getRank().getValue()){
-                num++;
-            }
-        }
-        if(num==1){ return true;}
-        else return false;
-    }
-    public boolean IsTwoPair (List<Card> cards){
-        int num = 0;
-        int num2=0;
         for(int i = 0; i < cards.size() - 1; i++){
             if(cards.get(i).getRank().getValue() == cards.get(i+1).getRank().getValue()){
-                num2=cards.get(i).getRank().getValue();
-                num++;
+                return Optional.of(new HandRank(cards, cards.subList(i,i+1), HandRanking.OnePair));
             }
-
         }
-        if(num==2){ return true;}
-        else return false;
+        return Optional.empty();
     }
 
-    public boolean IsTriple (List<Card> cards){
+    private Optional<HandRank> IsTwoPair (List<Card> cards){
+        int num = 0;
+        List<Card> c = new ArrayList<>();
+        for(int i = 0; i < cards.size() - 1; i++){
+            if(cards.get(i).getRank().getValue() == cards.get(i+1).getRank().getValue()){
+                num++;
+                c.add(c.get(i));
+            }
+        }
+        if(num ==2){
+            return Optional.of(new HandRank(cards, c, HandRanking.TwoPair));
+        }
+        return Optional.empty();
+    }
+
+    private Optional<HandRank> IsTriple (List<Card> cards){
         int num = 0;
         for(int i = 0; i < cards.size() - 2; i++){
-            if(cards.get(i).getRank().getValue() == cards.get(i+1).getRank().getValue()){
-                if(cards.get(i).getRank().getValue() == cards.get(i+2).getRank().getValue()){
-                    num++;
+            if(cards.get(i).getRank().getValue() == cards.get(i+2).getRank().getValue()){
+                    return Optional.of(new HandRank(cards, cards.subList(i,i+2), HandRanking.Triple));
                 }
-            }
 
         }
-        if(num==1){ return true;}
-        else return false;
+        return Optional.empty();
     }
-    public boolean IsFour (List<Card> cards){
+
+    private Optional<HandRank> IsFour (List<Card> cards){
         int num = 0;
         for(int i = 0; i < cards.size() - 3; i++){
-            if(cards.get(i).getRank().getValue() == cards.get(i+1).getRank().getValue()){
-                if(cards.get(i).getRank().getValue() == cards.get(i+2).getRank().getValue()){
-                    if(cards.get(i).getRank().getValue() == cards.get(i+3).getRank().getValue()){
-                        num++;
-                    }
-                }
+            if(cards.get(i).getRank().getValue() == cards.get(i+3).getRank().getValue()){
+                return Optional.of(new HandRank(cards, cards.subList(i,i+3), HandRanking.FourCard));
             }
-
         }
-        if(num==1){ return true;}
-        else return false;
+        return Optional.empty();
     }
 
-    public boolean IsFullhouse (List<Card> cards){
-        int num=0;
-        int n=0;
-        for(int i = 0; i < cards.size() - 2; i++){
-            if(cards.get(i).getRank().getValue() == cards.get(i+1).getRank().getValue()){
-                if(cards.get(i).getRank().getValue() == cards.get(i+2).getRank().getValue()){
-                    num++;
-                    n=cards.get(i).getSuit().getSuit();
-                }
-                if(n != cards.get(i).getRank().getValue()){
-                    num++;
+    private Optional<HandRank> IsFullhouse (List<Card> cards){
+        int num = 0;
+        List<Card> c = new ArrayList<>();
+        for(int i = 0; i < cards.size() -3; i++){
+            if(cards.get(i).getRank().getValue() == cards.get(i+2).getRank().getValue()) {
+                num = cards.get(i).getRank().getValue();
+                if (num < cards.get(i).getRank().getValue()) {
+                    num = cards.get(i).getRank().getValue();
+                    c.clear();
+                    c.addAll(cards.subList(i, i + 3));
                 }
             }
-
         }
-        if(num==2){ return true;}
-        else return false;
+        if(num == 0)  return Optional.empty();
+        for(int i = 0; i < cards.size() - 1; i++){
+            if(cards.get(i).getRank().getValue() == cards.get(i+1).getRank().getValue()){
+                 if(num != cards.get(i).getRank().getValue()){
+                     c.addAll(cards.subList(i,i+2));
+                     return Optional.of( new HandRank(cards, c, HandRanking.FullHouse));
+                 }
+            }
+        }
+        return Optional.empty();
     }
 
+    private Optional<HandRank> IsStright (List<Card> cards){
+        int num =0;
+        List<Card> card = new ArrayList<>();
+        List<Card> c = new ArrayList<>();
 
+        //for문 사용 안했을때 : c = cards.stream().distinct().toList();
+
+        for(int i =0; i < cards.size(); i++){
+            if(cards.get(i).getRank().getValue() == cards.get(i+1).getRank().getValue()){
+                cards.remove(i+1);
+            }
+        }
+        if(cards.size() <5 )  return Optional.empty();
+        for(int i = 0; i < cards.size(); i++){
+            if(cards.get(i).getRank().getValue()+1 == cards.get(i+1).getRank().getValue()){
+                num++;
+                c.add(cards.get(i));
+            }
+        }
+
+        if(num ==4) return Optional.of( new HandRank(cards, c, HandRanking.Straight));
+        return Optional.empty();
+    }
 }

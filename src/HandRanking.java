@@ -1,14 +1,14 @@
 public enum HandRanking {
-    HighCard(0,"HighCard"),
-    OnePair(1,"OnePair"),
-    TwoPair(2,"TwoPair"),
-    Triple(3,"Triple"),
-    Straight(4,"Straight"),
-    Flush(5,"Flush"),
-    FullHouse(6,"FullHouse"),
-    FourCard(7,"FourCard"),
-    StraightPlush(8,"StraightPlush"),
-    RoyalStraightPlush(9,"RoyalStraightPlush");
+    HighCard(1,"HighCard"),
+    OnePair(2,"OnePair"),
+    TwoPair(3,"TwoPair"),
+    Triple(4,"Triple"),
+    Straight(5,"Straight"),
+    Flush(6,"Flush"),
+    FullHouse(7,"FullHouse"),
+    FourCard(8,"FourCard"),
+    StraightPlush(9,"StraightPlush"),
+    RoyalStraightPlush(10,"RoyalStraightPlush");
 
     private final int score;
     private final String name;
