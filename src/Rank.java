@@ -1,6 +1,6 @@
 public enum Rank {
     //카드 이름, 숫자, 값
-    Ace("A", 1,14),
+    Ace("A", 14,1),
     Two("2", 2),
     Three("3",3),
     Four("4",4),
