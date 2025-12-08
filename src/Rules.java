@@ -4,15 +4,51 @@ public class Rules {
 
     private List<Card> cards;
 
-    public HandRanking hankRanking(List<Card> h, List<Card> p){
+    public HandRank hankRank(List<Card> h, List<Card> p){
         cardlist(h,p);
-        return HandRanking.HighCard;
+        Optional<HandRank> RSF = IsRoyalStrightFlush(cards);
+        if(RSF.isPresent()){
+            return RSF.get();
+        }
+        Optional<HandRank> SF = IsStrightFlush(cards);
+        if(SF.isPresent()){
+            return SF.get();
+        }
+        Optional<HandRank> Four = IsFour(cards);
+        if(Four.isPresent()){
+            return Four.get();
+        }
+        Optional<HandRank> Fullhouse = IsFullhouse(cards);
+        if(Fullhouse.isPresent()){
+            return Fullhouse.get();
+        }
+        Optional<HandRank> F = IsFlush(cards);
+        if(F.isPresent()){
+            return F.get();
+        }
+        Optional<HandRank> S = IsStright(cards);
+        if(S.isPresent()){
+            return S.get();
+        }
+
+        Optional<HandRank> Triple = IsTriple(cards);
+        if(Triple.isPresent()){
+            return Triple.get();
+        }
+        Optional<HandRank> Two = IsTwoPair(cards);
+        if(Two.isPresent()){
+            return Two.get();
+        }
+        Optional<HandRank> One = IsPair(cards);
+        if(One.isPresent()){
+            return One.get();
+        }
+        return new HandRank(cards, IsHigh(cards),HandRanking.HighCard);
     }
-    private void cardlist(List<Card> handcards, List<Card> potcard){
-        List<Card> card = new ArrayList<Card>();
+    private void cardlist(List<Card> handcards, List<Card> ccard){
+        List<Card> card = new ArrayList<>();
         card.addAll(handcards);
-        card.addAll(potcard);
-        int n = card.size();
+        card.addAll(ccard);
         for(int i = 0; i < card.size()-1; i++){
             for(int j = 1; j < card.size(); j++){
                 Card card1 = card.get(j-1);
@@ -25,7 +61,13 @@ public class Rules {
         this.cards=card;
     }
 
-    private Optional<HandRank> IsF (List<Card> cards) {
+    private List<Card> IsHigh(List<Card> cards){
+        List<Card> c = new ArrayList<>();
+        c.add(cards.get(cards.size()-1));
+        return c;
+    }
+
+    private Optional<HandRank> IsFlush (List<Card> cards) {
         cards = cards.stream().sorted(Comparator.comparing(Card::getSuit)).toList();
         for(int i =0; i<3;i++){
             if(cards.get(i).getSuit()==cards.get(i+4).getSuit()){
@@ -53,7 +95,7 @@ public class Rules {
         for(int i = 0; i < cards.size() - 1; i++){
             if(cards.get(i).getRank().getValue() == cards.get(i+1).getRank().getValue()){
                 num++;
-                c.add(c.get(i));
+                c.add(cards.get(i));
             }
         }
         if(num ==2){
@@ -63,7 +105,6 @@ public class Rules {
     }
 
     private Optional<HandRank> IsTriple (List<Card> cards){
-        int num = 0;
         for(int i = 0; i < cards.size() - 2; i++){
             if(cards.get(i).getRank().getValue() == cards.get(i+2).getRank().getValue()){
                     return Optional.of(new HandRank(cards, cards.subList(i,i+2), HandRanking.Triple));
@@ -74,7 +115,6 @@ public class Rules {
     }
 
     private Optional<HandRank> IsFour (List<Card> cards){
-        int num = 0;
         for(int i = 0; i < cards.size() - 3; i++){
             if(cards.get(i).getRank().getValue() == cards.get(i+3).getRank().getValue()){
                 return Optional.of(new HandRank(cards, cards.subList(i,i+3), HandRanking.FourCard));
@@ -110,25 +150,70 @@ public class Rules {
 
     private Optional<HandRank> IsStright (List<Card> cards){
         int num =0;
-        List<Card> card = new ArrayList<>();
+        List<Card> card = cards;
         List<Card> c = new ArrayList<>();
 
         //for문 사용 안했을때 : c = cards.stream().distinct().toList();
 
-        for(int i =0; i < cards.size(); i++){
-            if(cards.get(i).getRank().getValue() == cards.get(i+1).getRank().getValue()){
-                cards.remove(i+1);
+        for(int i =0; i < cards.size()-1; i++){
+            if(cards.get(i).getRank().getValue() != cards.get(i+1).getRank().getValue()){
+                card.add(cards.get(i));
             }
         }
-        if(cards.size() <5 )  return Optional.empty();
-        for(int i = 0; i < cards.size(); i++){
-            if(cards.get(i).getRank().getValue()+1 == cards.get(i+1).getRank().getValue()){
+        if(card.size() <5 )
+            return Optional.empty();
+
+        for(int i = 0; i < card.size(); i++){
+            if(card.get(i).getRank().getValue()+1 == card.get(i+1).getRank().getValue()){
+                num++;
+                c.add(card.get(i));
+            }
+            else {
+                num=0;
+                c.clear();
+            }
+        }
+
+        for(int i = 0; i < cards.size()-1; i++){
+            if(cards.get(i).getRank().getOthervalue()+1 == cards.get(i+1).getRank().getOthervalue()){
                 num++;
                 c.add(cards.get(i));
+            }
+            else{
+                num=0;
+                c.clear();
             }
         }
 
         if(num ==4) return Optional.of( new HandRank(cards, c, HandRanking.Straight));
+        else return Optional.empty();
+    }
+
+    private Optional<HandRank> IsStrightFlush (List<Card> cards){
+        Optional<HandRank> flush = IsFlush(cards);
+        if(flush.isEmpty()){
+            return Optional.empty();
+        }
+        HandRank flushhand = flush.get();
+        List<Card> strightcard = flushhand.rankcard();
+        Optional<HandRank> stright = IsStright(strightcard);
+        if(stright.isPresent()){
+            return Optional.of(new HandRank(cards, strightcard, HandRanking.StraightPlush));
+        }
         return Optional.empty();
     }
+
+    private Optional<HandRank> IsRoyalStrightFlush (List<Card> cards){
+        Optional <HandRank> SF =  IsStrightFlush(cards);
+        if(SF.isEmpty()){
+            return Optional.empty();
+        }
+        List<Card> SFcard = SF.get().rankcard();
+        int lastcard = SFcard.size()-1;
+        if(SFcard.get(lastcard).getRank().getValue() == 14){
+            return Optional.of(new HandRank(cards, SFcard, HandRanking.RoyalStraightPlush));
+        }
+        return Optional.empty();
+    }
+
 }
