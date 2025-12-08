@@ -3,7 +3,7 @@ import java.util.*;
 public class HumanPlayer implements Player{
     private String name;
     private int chips;
-    private Card[] holeCards = new Card[2];
+    private List<Card> holeCards = new ArrayList<>();
     private boolean folded =  false;
     private  Scanner sc = new Scanner(System.in);
 
@@ -25,12 +25,11 @@ public class HumanPlayer implements Player{
     public void deductChips(int amount){ chips -= amount; }
 
     @Override
-    public Card[] getHoleCards(){ return holeCards; }
+    public List<Card> getHoleCards(){ return holeCards; }
 
     @Override
-    public void setHoleCards(Card c1, Card c2){
-        holeCards[0] = c1;
-        holeCards[1] = c2;
+    public void setHoldCards(Card c){
+        holeCards.add(c);
     }
 
     @Override

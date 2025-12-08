@@ -3,7 +3,7 @@ import java.util.*;
 public class AIPlayer implements Player{
     private String name = "Computer";
     private int chips;
-    private Card[] holeCards = new Card[2];
+    private List<Card> holeCards = new ArrayList<>();
     private boolean folded = false;
 
     public AIPlayer(int chips) {
@@ -23,12 +23,11 @@ public class AIPlayer implements Player{
     public void deductChips(int amount) { chips -= amount; }
 
     @Override
-    public Card[] getHoleCards() { return holeCards; }
+    public List<Card> getHoleCards() { return holeCards; }
 
     @Override
-    public void setHoleCards(Card c1, Card c2) {
-        holeCards[0] = c1;
-        holeCards[1] = c2;
+    public void setHoldCards(Card c) {
+        holeCards.add(c);
     }
 
     @Override
@@ -68,17 +67,15 @@ public class AIPlayer implements Player{
 
     //프리플랍 평가 함수
     private boolean isStrongPreflopHand() {
-        Card a = holeCards[0];
-        Card b = holeCards[1];
+        holeCards.sort(Comparator.comparingInt(card->card.getRank().getValue()));
+        if(holeCards.get(0).getRank().getValue() == holeCards.get(1).getRank().getValue()) return true; //페어인지
+        if(holeCards.get(0).getSuit() == holeCards.get(1).getSuit()) return true;  //플러시
+        if(holeCards.get(0).getRank().getValue()+1 == holeCards.get(1).getRank().getValue()) return true; //스트레이트
 
-        boolean isPair = a.getRank() == b.getRank();
-        boolean suited = a.getSuit() == b.getSuit();
-        int diff = Math.abs(a.getRank() - b.getRank());
+        //스트레이트 혹은 플래시 인지
 
-        // 포켓페어, 높은 카드, 수딧 커넥터
-        if (isPair) return true;
-        if (a.getRank() >= 11 && b.getRank() >= 11) return true; // A,K,Q,J
-        if (suited && diff == 1) return true;                     // 8-9 suited 등
+
+        if (holeCards.get(0).getRank().getValue() >= 11 || holeCards.get(1).getRank().getValue() >= 11) return true; // A,K,Q,J
 
         return false;
     }
@@ -86,7 +83,9 @@ public class AIPlayer implements Player{
     //포스트플랍 족보 평가
     private int evaluateHand(List<Card> community) {
         // 원페어=1, 투페어=2, 트리플=3 ... 같은 형태로 점수화 (단순 버전)
-        return HandEvaluator.evaluate(holeCards, community);
+        Rules r = new Rules();
+        HandRank rank = r.hankRank(holeCards, community);
+        return rank.handRanking().getScore();
     }
 
     @Override
