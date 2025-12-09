@@ -1,12 +1,14 @@
 import java.util.*;
 
 public class AIPlayer implements Player{
-    private String name = "Computer";
+    private static int num = 1;
+    private String name = "Computer "+num;
     private int chips;
     private List<Card> holeCards = new ArrayList<>();
     private boolean folded = false;
 
     public AIPlayer(int chips) {
+        num++;
         this.chips = chips;
     }
 
