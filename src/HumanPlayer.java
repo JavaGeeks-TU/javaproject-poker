@@ -55,8 +55,9 @@ public class HumanPlayer implements Player{
     }
 
     @Override
-    public void check(){
+    public int check(){
         System.out.println(name + "이(가) Check");
+        return 0;
     }
 
     @Override

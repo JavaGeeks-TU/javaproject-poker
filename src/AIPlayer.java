@@ -53,8 +53,9 @@ public class AIPlayer implements Player{
     }
 
     @Override
-    public void check() {
+    public int check() {
         System.out.println("Computer가 Check 했습니다.");
+        return 0;
     }
 
     @Override
