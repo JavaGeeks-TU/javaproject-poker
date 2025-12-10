@@ -36,15 +36,15 @@ public class AIPlayer extends Player {
 
     //프리플랍 평가 함수
     private boolean isStrongPreflopHand() {
-        holeCards.sort(Comparator.comparingInt(card->card.getRank().getValue()));
-        if(holeCards.get(0).getRank().getValue() == holeCards.get(1).getRank().getValue()) return true; //페어인지
-        if(holeCards.get(0).getSuit() == holeCards.get(1).getSuit()) return true;  //플러시
-        if(holeCards.get(0).getRank().getValue()+1 == holeCards.get(1).getRank().getValue()) return true; //스트레이트
+        holdCards.sort(Comparator.comparingInt(card->card.getRank().getValue()));
+        if(holdCards.get(0).getRank().getValue() == holdCards.get(1).getRank().getValue()) return true; //페어인지
+        if(holdCards.get(0).getSuit() == holdCards.get(1).getSuit()) return true;  //플러시
+        if(holdCards.get(0).getRank().getValue()+1 == holdCards.get(1).getRank().getValue()) return true; //스트레이트
 
         //스트레이트 혹은 플래시 인지
 
 
-        if (holeCards.get(0).getRank().getValue() >= 11 || holeCards.get(1).getRank().getValue() >= 11) return true; // A,K,Q,J
+        if (holdCards.get(0).getRank().getValue() >= 11 || holdCards.get(1).getRank().getValue() >= 11) return true; // A,K,Q,J
 
         return false;
     }
@@ -53,7 +53,7 @@ public class AIPlayer extends Player {
     private int evaluateHand(List<Card> community) {
         // 원페어=1, 투페어=2, 트리플=3 ... 같은 형태로 점수화 (단순 버전)
         Rules r = new Rules();
-        HandRank rank = r.hankRank(holeCards, community);
+        HandRank rank = r.hankRank(holdCards, community);
         return rank.handRanking().getScore();
     }
 
@@ -73,7 +73,6 @@ public class AIPlayer extends Player {
 
     //프리플랍 액션
     private Action decidePreflop(int currentBet) {
-
         boolean strong = isStrongPreflopHand();
 
         if (strong) {

@@ -40,10 +40,7 @@ public class Rules {
             return Two.get();
         }
         Optional<HandRank> One = IsPair(cards);
-        if(One.isPresent()){
-            return One.get();
-        }
-        return new HandRank(cards, IsHigh(cards),HandRanking.HighCard);
+        return One.orElseGet(() -> new HandRank(cards, IsHigh(cards), HandRanking.HighCard));
     }
     private void cardlist(List<Card> handcards, List<Card> ccard){
         List<Card> card = new ArrayList<>();

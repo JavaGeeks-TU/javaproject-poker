@@ -11,6 +11,13 @@ public class Game {
     private Scanner sc;
     private List<Player> players;
     private PrintCard printCard;
+    private int pot;
+    private int currentBet;
+    private List<Card> communtiyCards;
+    private int dealer = 0;
+    private int playersize;
+    private int bigblind;
+    private int smallblind;
 
     public Game(){
         deck = new Deck();
@@ -20,7 +27,9 @@ public class Game {
         ais = new ArrayList<>();
         players = new ArrayList<>();
         printCard = new PrintCard();
-
+        pot = 0;
+        currentBet =0;
+        communtiyCards = new ArrayList<>();
     }
 
     public void start(){
@@ -38,10 +47,32 @@ public class Game {
     public void play (){
         players.add(player);
         players.addAll(ais);
-        for(int i =0; i<2; i++){
-            for(int j = 0; j<players.size(); j++){
-                players.get(j).setHoldCards(deck.drawCard());
+        playersize = players.size();
+        bigblind = (dealer+2)%playersize;
+        smallblind = (dealer+1)%playersize;
+        for(int i = 0;i<2;i++){
+            for(int j = 0;j<playersize;j++){
+                players.get((smallblind+j)%playersize).setHoldCards(deck.drawCard());
             }
-        }//tlfj
-    }
+        }
+        System.out.print("당신의 카드 : ");
+        printCard.print(player.getHoleCards());
+        for(Player p:players){
+            Action action = players.get(bigblind).takeAction(currentBet, pot, communtiyCards);
+            switch (action) {
+                case Action.AllIn allIn -> {
+                }
+                case Action.Bet bet -> {
+                }
+                case Action.Call call -> {
+                }
+                case Action.Check check -> {
+                }
+                case Action.Fold fold -> {
+                }
+            }
+
+        }
+
+    }//넹? 구조보니까 머요 왜요 머요 문제 많지?
 }
