@@ -1,8 +1,7 @@
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class Kikier {
+public class Kicker {
     public Card kikier(HandRank handRank) {
         List<Card> cards = handRank.c();
         for(int i=0; i<handRank.rankcard().size();i++){

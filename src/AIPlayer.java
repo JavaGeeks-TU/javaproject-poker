@@ -1,71 +1,37 @@
 import java.util.*;
 
-public class AIPlayer implements Player{
+public class AIPlayer extends Player {
     private static int num = 1;
-    private String name = "Computer "+num;
-    private int chips;
-    private List<Card> holeCards = new ArrayList<>();
-    private boolean folded = false;
 
     public AIPlayer(int chips) {
-        num++;
+        this.name = "Computer " + num++;
         this.chips = chips;
     }
 
     @Override
-    public String getName() { return name; }
-
-    @Override
-    public int getChips() { return chips; }
-
-    @Override
-    public void addChips(int amount) { chips += amount; }
-
-    @Override
-    public void deductChips(int amount) { chips -= amount; }
-
-    @Override
-    public List<Card> getHoleCards() { return holeCards; }
-
-    @Override
-    public void setHoldCards(Card c) {
-        holeCards.add(c);
-    }
-
-    @Override
-    public boolean isFolded() { return folded; }
-
-    @Override
-    public void fold() { folded = true; }
-
-    @Override
-    public int bet(int amount) {
+    public void bet(int amount) {
         amount = Math.min(amount, chips);
         deductChips(amount);
         System.out.println("Computer가 " + amount + "을 Bet/Raise 했습니다.");
-        return amount;
     }
 
     @Override
-    public int call(int amount) {
+    public void call(int amount) {
         int callAmount = Math.min(amount, chips);
         deductChips(callAmount);
         System.out.println("Computer가 " + callAmount + "을 Call 했습니다.");
-        return callAmount;
     }
 
     @Override
-    public int check() {
+    public void check() {
         System.out.println("Computer가 Check 했습니다.");
-        return 0;
     }
 
     @Override
-    public int allIn() {
+    public void allIn() {
         int amount = chips;
         chips = 0;
         System.out.println("Computer가 All-in! ( " + amount + " )");
-        return amount;
     }
 
     //프리플랍 평가 함수
@@ -92,7 +58,7 @@ public class AIPlayer implements Player{
     }
 
     @Override
-    public int takeAction(int currentBet, int pot, List<Card> communityCards) {
+    public Action takeAction(int currentBet, int pot, List<Card> communityCards) {
 
         try { Thread.sleep(900); } catch (Exception e) {}
 
@@ -106,7 +72,7 @@ public class AIPlayer implements Player{
     }
 
     //프리플랍 액션
-    private int decidePreflop(int currentBet) {
+    private Action decidePreflop(int currentBet) {
 
         boolean strong = isStrongPreflopHand();
 
@@ -114,44 +80,59 @@ public class AIPlayer implements Player{
             // 강한 핸드
             if (currentBet == 0) {
                 // 아무도 베팅 안 함 → Bet (or Raise)
-                return bet(30);
+                bet(30);
+                return new Action.Bet(30);
             } else {
                 // 상대 Raise 있음 → Call
-                return call(currentBet);
+                call(currentBet);
+                return new Action.Call(currentBet);
             }
         } else {
             // 약한 핸드
             if (currentBet == 0) {
-                return check();
+                check();
+                return new Action.Check();
             } else {
                 // 상대가 Bet 했으면 Fold
                 fold();
-                return -1;
+                return new Action.Fold();
             }
         }
     }
 
     //포스트플랍 액션
-    private int decidePostFlop(int currentBet, List<Card> community) {
+    private Action decidePostFlop(int currentBet, List<Card> community) {
 
         int handRank = evaluateHand(community);
 
         if (handRank >= 3) {
             // Two Pair 이상 → 공격적
-            if (currentBet == 0)  return bet(40);
-            else return call(currentBet);
+            if (currentBet == 0) {
+                bet(40);
+                return new Action.Bet(40);
+            } else {
+                call(currentBet);
+                return new Action.Call(currentBet);
+            }
         }
         else if (handRank >= 1) {
             // One Pair ~ Two Pair 사이 → 보통 공격
-            if (currentBet == 0) return check();
-            else return call(currentBet);
+            if (currentBet == 0) {
+                check();
+                return new Action.Check();
+            } else {
+                call(currentBet);
+                return new Action.Call(currentBet);
+            }
         }
         else {
             // High card → 약함
-            if (currentBet == 0) return check();
-            else {
+            if (currentBet == 0) {
+                check();
+                return new Action.Check();
+            } else {
                 fold();
-                return -1;
+                return new Action.Fold();
             }
         }
     }
