@@ -1,42 +1,10 @@
 import java.util.*;
 
-public class HumanPlayer implements Player{
-    private String name;
-    private int chips;
-    private List<Card> holeCards = new ArrayList<>();
-    private boolean folded =  false;
-    private  Scanner sc = new Scanner(System.in);
+public class HumanPlayer extends Temp {
 
-    public HumanPlayer(String name, int chips){
-        this.name = name;
-        this.chips = chips;
+    public HumanPlayer(String name, int chips) {
+       super(name, chips);
     }
-
-    @Override
-    public String getName() { return name; }
-
-    @Override
-    public int getChips() { return chips; }
-
-    @Override
-    public void addChips(int amount){ chips += amount; }
-
-    @Override
-    public void deductChips(int amount){ chips -= amount; }
-
-    @Override
-    public List<Card> getHoleCards(){ return holeCards; }
-
-    @Override
-    public void setHoldCards(Card c){
-        holeCards.add(c);
-    }
-
-    @Override
-    public boolean isFolded(){ return folded; }
-
-    @Override
-    public void fold(){ folded = true; }
 
     @Override
     public int bet(int amount){

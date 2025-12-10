@@ -90,7 +90,7 @@ public class AIPlayer implements Player{
     }
 
     @Override
-    public int takeAction(int currentBet, int pot, List<Card> communityCards) {
+    public Action takeAction(int currentBet, int pot, List<Card> communityCards) {
 
         try { Thread.sleep(900); } catch (Exception e) {}
 
@@ -104,7 +104,7 @@ public class AIPlayer implements Player{
     }
 
     //프리플랍 액션
-    private int decidePreflop(int currentBet) {
+    private Action decidePreflop(int currentBet) {
 
         boolean strong = isStrongPreflopHand();
 
@@ -112,19 +112,21 @@ public class AIPlayer implements Player{
             // 강한 핸드
             if (currentBet == 0) {
                 // 아무도 베팅 안 함 → Bet (or Raise)
-                return bet(30);
+                bet(30);
+                return new Action.Bet(30);
             } else {
                 // 상대 Raise 있음 → Call
-                return call(currentBet);
+                call(currentBet);
+                return new Action.Call(currentBet);
             }
         } else {
             // 약한 핸드
             if (currentBet == 0) {
-                return check();
+                return new Action.Check();
             } else {
                 // 상대가 Bet 했으면 Fold
                 fold();
-                return -1;
+                return new Action.Fold();
             }
         }
     }
