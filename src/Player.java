@@ -1,24 +1,37 @@
+import java.util.ArrayList;
 import java.util.List;
 
-public interface Player {
+public abstract class Player {
+    protected String name;
+    protected int chips;
+    protected List<Card> holeCards = new ArrayList<>();
+    protected boolean folded = false;
 
-    String getName();
-    int getChips();
-    void addChips(int amount);
-    void deductChips(int amount);
+    public String getName() { return name; }
 
-    List<Card> getHoleCards();
-    void setHoldCards(Card c);
+    public int getChips() { return chips; }
 
-    boolean isFolded();
-    void fold();
+    public void addChips(int amount){ chips += amount; }
 
-    //액션 메서드
-    int bet(int amount);  //Bet or Raise
-    int call(int amount); //Call
-    int check();         //Check
-    int allIn();          //All in
+    public void deductChips(int amount){ chips -= amount; }
 
-    //현재 턴에 어떤 액션을 할지 결정
-    int takeAction(int currentBet, int pot, List<Card> communityCards);
+    public List<Card> getHoleCards(){ return holeCards; }
+
+    public void setHoldCards(Card c){
+        holeCards.add(c);
+    }
+
+    public boolean isFolded(){ return folded; }
+
+    public void fold(){ folded = true; }
+
+    abstract void bet(int amount);
+
+    abstract void call(int amount);
+
+    abstract void check();
+
+    abstract void allIn();
+
+    abstract Action takeAction(int currentBet, int pot, List<Card> communityCards);
 }

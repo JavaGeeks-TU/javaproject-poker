@@ -1,75 +1,42 @@
 import java.util.*;
 
-public class HumanPlayer implements Player{
-    private String name;
-    private int chips;
-    private List<Card> holeCards = new ArrayList<>();
-    private boolean folded =  false;
-    private  Scanner sc = new Scanner(System.in);
+public class HumanPlayer extends Player {
+    private Scanner sc;
 
-    public HumanPlayer(String name, int chips){
+    public HumanPlayer(String name, int chips, Scanner sc){
         this.name = name;
         this.chips = chips;
+        this.sc = sc;
     }
 
     @Override
-    public String getName() { return name; }
-
-    @Override
-    public int getChips() { return chips; }
-
-    @Override
-    public void addChips(int amount){ chips += amount; }
-
-    @Override
-    public void deductChips(int amount){ chips -= amount; }
-
-    @Override
-    public List<Card> getHoleCards(){ return holeCards; }
-
-    @Override
-    public void setHoldCards(Card c){
-        holeCards.add(c);
-    }
-
-    @Override
-    public boolean isFolded(){ return folded; }
-
-    @Override
-    public void fold(){ folded = true; }
-
-    @Override
-    public int bet(int amount){
+    public void bet(int amount){
         amount = Math.min(amount, chips);
         deductChips(amount);
         System.out.println(name + "이(가) " + amount + "을 Bet/Raise");
-        return amount;
     }
 
     @Override
-    public int call(int amount){
+    public void call(int amount){
         int callAmount = Math.min(amount, chips);
         deductChips(callAmount);
         System.out.println(name + "이(가) " + callAmount + "을 call");
-        return callAmount;
     }
 
     @Override
-    public int check(){
+    public void check(){
         System.out.println(name + "이(가) Check");
-        return 0;
     }
 
     @Override
-    public int allIn(){
+    public void allIn(){
         int amount = chips;
         chips = 0;
         System.out.println(name + "이(가) All-in( " + amount + " )");
-        return amount;
     }
 
     @Override
-    public int takeAction(int currentBet, int pot, List<Card> communityCards) {
+    public Action takeAction(int currentBet, int pot, List<Card> communityCards) {
 
         System.out.println("\n==== " + name + "의 턴 ====");
         System.out.println("현재 칩: " + chips);
@@ -93,18 +60,26 @@ public class HumanPlayer implements Player{
 
         switch (action) {
             case 1:
-                if (currentBet == 0) { check(); return 0; }
-                else return call(currentBet);
+                if (currentBet == 0) {
+                    check();
+                    return new Action.Check();
+                } else {
+                    call(currentBet);
+                    return new Action.Call(currentBet);
+                }
             case 2:
                 System.out.print("베팅 금액 입력: ");
                 int amount = sc.nextInt();
-                return bet(amount);
+                bet(amount);
+                return new Action.Bet(amount);
             case 3:
-                return allIn();
+                allIn();
+                return new Action.AllIn();
             case 4:
                 fold();
-                return -1;
+                return new Action.Fold();
+            default:
+                return new Action.Check();
         }
-        return 0;
     }
 }
