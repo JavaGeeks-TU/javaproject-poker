@@ -105,8 +105,10 @@ public class Game {
                 System.out.print(nowplayer.name+" 카드 공개 : ");
                 printCard.print(nowplayer.getHoldCards());
                 nowplayer.setHandRank(rules.hankRank(nowplayer.getHoldCards(),communtiyCards));
+                System.out.println(nowplayer.getHandRank().handRanking().getName());
             }
-            winner(players);
+            Player win = winner(players);
+            System.out.println(win.getName()+"가 이겼습니다. \n다음라운드로 넘어갑니다.");
             if(player.chips==0){
                 isplay=false;
                 System.out.println("게임이 끝났습니다. 계속 하시겠습니까? YES[0],NO[1]");
@@ -122,10 +124,18 @@ public class Game {
     }
 
     public Player winner(List<Player> players){
-        List<Player> winners = players;
-        players.sort(Comparator.comparingInt(player ->player.getHandRank().handRanking().getScore()));
-
-        return winners.get(-1);
+        List<Player> playerList = players;
+        playerList.sort(Comparator.comparingInt((player ->player.getHandRank().handRanking().getScore())));
+        playerList = playerList.reversed();
+        Player winner = playerList.getFirst();
+        for(int i = 1; i< playerList.size()-1; i++){
+            if(playerList.getFirst().getHandRank() == playerList.get(i).getHandRank()){
+                if(kicker.kicker(playerList.get(0).getHandRank()).getRank().getValue() < kicker.kicker(playerList.get(i).getHandRank()).getRank().getValue()){
+                    winner = playerList.get(i);
+                }
+            }
+        }
+        return winner;
     }
     //아직 남았다
 }
