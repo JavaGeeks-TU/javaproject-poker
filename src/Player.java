@@ -6,6 +6,15 @@ public abstract class Player {
     protected int chips;
     protected List<Card> holdCards = new ArrayList<>();
     protected boolean folded = false;
+    protected HandRank handRank;
+
+    public void winner(int pot){chips+=pot;};
+
+    public void setHandRank(HandRank handRank){
+        this.handRank = handRank;
+    }
+
+    public HandRank getHandRank(){return handRank;}
 
     public String getName() { return name; }
 
@@ -15,7 +24,7 @@ public abstract class Player {
 
     public void deductChips(int amount){ chips -= amount; }
 
-    public List<Card> getHoleCards(){ return holdCards; }
+    public List<Card> getHoldCards(){ return holdCards; }
 
     public void setHoldCards(Card c){
         holdCards.add(c);

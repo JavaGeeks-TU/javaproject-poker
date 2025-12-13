@@ -64,11 +64,18 @@ public class Rules {
         return c;
     }
 
-    private Optional<HandRank> IsFlush (List<Card> cards) {
+    private Optional<HandRank> IsFlush (List<Card> originalCard) {
+        List<Card> cards = new ArrayList<>();
+        cards = originalCard;
         cards = cards.stream().sorted(Comparator.comparing(Card::getSuit)).toList();
-        for(int i =0; i<3;i++){
+        int size =1;
+        if(cards.size() ==6){
+            size = 2;
+        }
+        else if(cards.size() ==7){ size =3;}
+        for(int i =0; i<size;i++){
             if(cards.get(i).getSuit()==cards.get(i+4).getSuit()){
-                List<Card> c = cards.subList(i,i+4);
+                List<Card> c = cards.subList(i,i+5);
                 c = c.stream().sorted(Comparator.comparing(Card::getRank)).toList();
                 return Optional.of(new HandRank(cards ,c, HandRanking.Flush));
             }
@@ -147,7 +154,7 @@ public class Rules {
 
     private Optional<HandRank> IsStright (List<Card> cards){
         int num =0;
-        List<Card> card = cards;
+        List<Card> card = new ArrayList<>();
         List<Card> c = new ArrayList<>();
 
         //for문 사용 안했을때 : c = cards.stream().distinct().toList();
@@ -160,7 +167,7 @@ public class Rules {
         if(card.size() <5 )
             return Optional.empty();
 
-        for(int i = 0; i < card.size(); i++){
+        for(int i = 0; i < card.size()-1; i++){
             if(card.get(i).getRank().getValue()+1 == card.get(i+1).getRank().getValue()){
                 num++;
                 c.add(card.get(i));

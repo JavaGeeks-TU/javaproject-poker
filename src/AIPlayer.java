@@ -12,26 +12,26 @@ public class AIPlayer extends Player {
     public void bet(int amount) {
         amount = Math.min(amount, chips);
         deductChips(amount);
-        System.out.println("Computer가 " + amount + "을 Bet/Raise 했습니다.");
+        System.out.println(name+"가 " + amount + "을 Bet/Raise 했습니다.");
     }
 
     @Override
     public void call(int amount) {
         int callAmount = Math.min(amount, chips);
         deductChips(callAmount);
-        System.out.println("Computer가 " + callAmount + "을 Call 했습니다.");
+        System.out.println(name+"가 " + callAmount + "을 Call 했습니다.");
     }
 
     @Override
     public void check() {
-        System.out.println("Computer가 Check 했습니다.");
+        System.out.println(name+"가 Check 했습니다.");
     }
 
     @Override
     public void allIn() {
         int amount = chips;
         chips = 0;
-        System.out.println("Computer가 All-in! ( " + amount + " )");
+        System.out.println(name+"가  All-in! ( " + amount + " )");
     }
 
     //프리플랍 평가 함수
@@ -66,7 +66,10 @@ public class AIPlayer extends Player {
 
         if (preflop) {
             return decidePreflop(currentBet);
-        } else {
+        } else if(isFolded()){
+            return new Action.Fold();
+        }
+        else {
             return decidePostFlop(currentBet, communityCards);
         }
     }
@@ -88,7 +91,7 @@ public class AIPlayer extends Player {
             }
         } else {
             // 약한 핸드
-            if (currentBet == 0) {
+            if (currentBet != 0) {
                 check();
                 return new Action.Check();
             } else {
