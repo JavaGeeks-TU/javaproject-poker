@@ -12,39 +12,39 @@ public class AIPlayer extends Player {
     public void bet(int amount) {
         amount = Math.min(amount, chips);
         deductChips(amount);
-        System.out.println("Computer가 " + amount + "을 Bet/Raise 했습니다.");
+        System.out.println(name+"가 " + amount + "을 Bet/Raise 했습니다.");
     }
 
     @Override
     public void call(int amount) {
         int callAmount = Math.min(amount, chips);
         deductChips(callAmount);
-        System.out.println("Computer가 " + callAmount + "을 Call 했습니다.");
+        System.out.println(name+"가 " + callAmount + "을 Call 했습니다.");
     }
 
     @Override
     public void check() {
-        System.out.println("Computer가 Check 했습니다.");
+        System.out.println(name+"가 Check 했습니다.");
     }
 
     @Override
     public void allIn() {
         int amount = chips;
         chips = 0;
-        System.out.println("Computer가 All-in! ( " + amount + " )");
+        System.out.println(name+"가  All-in! ( " + amount + " )");
     }
 
     //프리플랍 평가 함수
     private boolean isStrongPreflopHand() {
-        holeCards.sort(Comparator.comparingInt(card->card.getRank().getValue()));
-        if(holeCards.get(0).getRank().getValue() == holeCards.get(1).getRank().getValue()) return true; //페어인지
-        if(holeCards.get(0).getSuit() == holeCards.get(1).getSuit()) return true;  //플러시
-        if(holeCards.get(0).getRank().getValue()+1 == holeCards.get(1).getRank().getValue()) return true; //스트레이트
+        holdCards.sort(Comparator.comparingInt(card->card.getRank().getValue()));
+        if(holdCards.get(0).getRank().getValue() == holdCards.get(1).getRank().getValue()) return true; //페어인지
+        if(holdCards.get(0).getSuit() == holdCards.get(1).getSuit()) return true;  //플러시
+        if(holdCards.get(0).getRank().getValue()+1 == holdCards.get(1).getRank().getValue()) return true; //스트레이트
 
         //스트레이트 혹은 플래시 인지
 
 
-        if (holeCards.get(0).getRank().getValue() >= 11 || holeCards.get(1).getRank().getValue() >= 11) return true; // A,K,Q,J
+        if (holdCards.get(0).getRank().getValue() >= 11 || holdCards.get(1).getRank().getValue() >= 11) return true; // A,K,Q,J
 
         return false;
     }
@@ -53,7 +53,7 @@ public class AIPlayer extends Player {
     private int evaluateHand(List<Card> community) {
         // 원페어=1, 투페어=2, 트리플=3 ... 같은 형태로 점수화 (단순 버전)
         Rules r = new Rules();
-        HandRank rank = r.hankRank(holeCards, community);
+        HandRank rank = r.hankRank(holdCards, community);
         return rank.handRanking().getScore();
     }
 
@@ -66,14 +66,16 @@ public class AIPlayer extends Player {
 
         if (preflop) {
             return decidePreflop(currentBet);
-        } else {
+        } else if(isFolded()){
+            return new Action.Fold();
+        }
+        else {
             return decidePostFlop(currentBet, communityCards);
         }
     }
 
     //프리플랍 액션
     private Action decidePreflop(int currentBet) {
-
         boolean strong = isStrongPreflopHand();
 
         if (strong) {
@@ -89,7 +91,7 @@ public class AIPlayer extends Player {
             }
         } else {
             // 약한 핸드
-            if (currentBet == 0) {
+            if (currentBet != 0) {
                 check();
                 return new Action.Check();
             } else {

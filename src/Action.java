@@ -3,5 +3,5 @@ public sealed interface Action {
     record Call(int chips) implements Action {}
     record Check() implements Action {}
     record Fold() implements Action {}
-    record AllIn() implements Action {}
+    record AllIn(int chips) implements Action {}
 }
