@@ -42,5 +42,5 @@ public abstract class Player {
 
     abstract void allIn();
 
-    abstract Action takeAction(int currentBet, int pot, List<Card> communityCards);
+    abstract Action takeAction(int currentBet, int pot, List<Card> communityCards, boolean whoBet);
 }

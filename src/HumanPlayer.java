@@ -36,7 +36,7 @@ public class HumanPlayer extends Player {
     }
 
     @Override
-    public Action takeAction(int currentBet, int pot, List<Card> communityCards) {
+    public Action takeAction(int currentBet, int pot, List<Card> communityCards, boolean whoBet) {
 
         if(folded){
             System.out.println("폴드 했습니다.");
@@ -53,7 +53,7 @@ public class HumanPlayer extends Player {
             System.out.println("현재 베팅(BB 대비): " + currentBet);
             System.out.println("가능한 선택:");
 
-            if (currentBet == 0) {
+            if (!whoBet) {
                 System.out.println("[1] Check");
                 System.out.println("[2] Bet");
                 System.out.println("[3] All-in");
@@ -70,7 +70,7 @@ public class HumanPlayer extends Player {
 
             switch (action) {
                 case 1:
-                    if (currentBet == 0) {
+                    if (!whoBet) {
                         check();
                         return new Action.Check();
                     } else {
@@ -80,7 +80,7 @@ public class HumanPlayer extends Player {
                 case 2:
                     System.out.print("베팅 금액 입력: ");
                     int amount = sc.nextInt();
-                    bet(amount+currentBet);
+                    bet(amount);
                     return new Action.Bet(amount);
                 case 3:
                     int chip = chips;

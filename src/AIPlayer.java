@@ -41,12 +41,7 @@ public class AIPlayer extends Player {
         if(holdCards.get(0).getSuit() == holdCards.get(1).getSuit()) return true;  //플러시
         if(holdCards.get(0).getRank().getValue()+1 == holdCards.get(1).getRank().getValue()) return true; //스트레이트
 
-        //스트레이트 혹은 플래시 인지
-
-
-        if (holdCards.get(0).getRank().getValue() >= 11 || holdCards.get(1).getRank().getValue() >= 11) return true; // A,K,Q,J
-
-        return false;
+        return holdCards.get(0).getRank().getValue() >= 11 || holdCards.get(1).getRank().getValue() >= 11; // A,K,Q,J
     }
 
     //포스트플랍 족보 평가
@@ -58,24 +53,24 @@ public class AIPlayer extends Player {
     }
 
     @Override
-    public Action takeAction(int currentBet, int pot, List<Card> communityCards) {
+    public Action takeAction(int currentBet, int pot, List<Card> communityCards, boolean whoBet) {
 
         try { Thread.sleep(900); } catch (Exception e) {}
 
         boolean preflop = communityCards.size() == 0;
 
         if (preflop) {
-            return decidePreflop(currentBet);
+            return decidePreflop(currentBet, whoBet);
         } else if(isFolded()){
             return new Action.Fold();
         }
         else {
-            return decidePostFlop(currentBet, communityCards);
+            return decidePostFlop(currentBet, communityCards, whoBet);
         }
     }
 
     //프리플랍 액션
-    private Action decidePreflop(int currentBet) {
+    private Action decidePreflop(int currentBet, boolean whoBet) {
         boolean strong = isStrongPreflopHand();
 
         if (strong) {
@@ -91,7 +86,7 @@ public class AIPlayer extends Player {
             }
         } else {
             // 약한 핸드
-            if (currentBet != 0) {
+            if (currentBet != 0 && !whoBet) {
                 check();
                 return new Action.Check();
             } else {
@@ -103,7 +98,7 @@ public class AIPlayer extends Player {
     }
 
     //포스트플랍 액션
-    private Action decidePostFlop(int currentBet, List<Card> community) {
+    private Action decidePostFlop(int currentBet, List<Card> community, boolean whoBet) {
 
         int handRank = evaluateHand(community);
 
@@ -119,7 +114,7 @@ public class AIPlayer extends Player {
         }
         else if (handRank >= 1) {
             // One Pair ~ Two Pair 사이 → 보통 공격
-            if (currentBet == 0) {
+            if (currentBet == 0 && !whoBet) {
                 check();
                 return new Action.Check();
             } else {
@@ -129,7 +124,7 @@ public class AIPlayer extends Player {
         }
         else {
             // High card → 약함
-            if (currentBet == 0) {
+            if (currentBet == 0 && !whoBet) {
                 check();
                 return new Action.Check();
             } else {

@@ -48,7 +48,6 @@ public class Game {
 
     public void play (){
         while(isplay) {
-            currentBet = 20;
             players.add(player);
             players.addAll(ais);
             playersize = players.size();
@@ -62,16 +61,19 @@ public class Game {
             System.out.print("당신의 카드 : ");
             printCard.print(player.getHoldCards());
             for (int j = 0; j < 4; j++) {
+                boolean whoBet = false;
                 for (int i = 0; i < playersize; i++) {
-                    Action action = players.get((bigblind + i) % playersize).takeAction(currentBet, pot, communtiyCards);
+                    Action action = players.get((bigblind + i) % playersize).takeAction(currentBet, pot, communtiyCards, whoBet);
                     switch (action) {
                         case Action.AllIn allIn -> {
+                            whoBet = true;
                             pot += allIn.chips();
                             if (currentBet < allIn.chips()) {
                                 currentBet = allIn.chips();
                             }
                         }
                         case Action.Bet bet -> {
+                            whoBet = true;
                             currentBet = bet.chips();
                             pot += bet.chips();
                         }
