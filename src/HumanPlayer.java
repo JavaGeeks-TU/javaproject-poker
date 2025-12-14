@@ -23,9 +23,8 @@ public class HumanPlayer extends Player {
 
     @Override
     public void call(int amount){
-        int callAmount = Math.min(amount, chips);
-        deductChips(callAmount);
-        System.out.println(name + "이(가) " + callAmount + "을 call");
+        chips -=amount;
+        System.out.println(name + "이(가) " + amount + "을 call");
     }
 
     @Override
@@ -35,6 +34,7 @@ public class HumanPlayer extends Player {
 
     @Override
     public void allIn(){
+        allined =true;
         if(chips == 0){
             System.out.println(name+"의 잔액이 없습니다. 넘어갑니다.");
         }
@@ -46,14 +46,14 @@ public class HumanPlayer extends Player {
     }
 
     @Override
-    public Action takeAction(int currentBet, int pot, List<Card> communityCards, boolean whoBet) {
+    public Action takeAction(int currentBet, int pot, List<Card> communityCards) {
 
         if(folded){
             System.out.println("폴드 했습니다.");
             return new Action.Fold();
         }
         else if(chips == 0){
-            return new Action.AllIn(currentBet);
+            return new Action.AllIn(chips);
         }
         else {
             System.out.println("\n==== " + name + "의 턴 ====");
@@ -61,7 +61,7 @@ public class HumanPlayer extends Player {
             System.out.println("현재 칩: " + chips);
             System.out.println("현재 배팅 : " + currentBet);
             System.out.println("가능한 선택:");
-            if (!whoBet) {
+            if (currentBet==0) {
                 System.out.println("[1] Check");
                 System.out.println("[2] Bet");
                 System.out.println("[3] All-in");
@@ -82,7 +82,7 @@ public class HumanPlayer extends Player {
 
             switch (action) {
                 case 1:
-                    if (!whoBet) {
+                    if (currentBet==0) {
                         check();
                         return new Action.Check();
                     } else {
@@ -101,9 +101,9 @@ public class HumanPlayer extends Player {
                             System.out.println("현재 보유금액보다 높습니다. 다시 입력해주세요.");
                         }
                     }while(amount<currentBet);
-                    if(!whoBet){
+                    if(currentBet==0){
                         bet(amount);
-                        return new Action.Raise(amount);
+                        return new Action.Bet(amount);
                     }
                     raise(amount);
                     return new Action.Raise(amount);

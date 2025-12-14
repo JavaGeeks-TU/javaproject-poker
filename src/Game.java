@@ -28,8 +28,6 @@ public class Game {
         ais = new ArrayList<>();
         players = new ArrayList<>();
         printCard = new PrintCard();
-        pot = 0;
-        currentBet =0;
         communtiyCards = new ArrayList<>();
         isplay = true;
     }
@@ -52,6 +50,9 @@ public class Game {
         playersize = players.size();
 
         while(isplay) {
+            pot = 0;
+            currentBet =0;
+            communtiyCards.clear();
             int foldcount =0;
             bigblind = (dealer + 2) % playersize;
             smallblind = (dealer + 1) % playersize;
@@ -81,24 +82,29 @@ public class Game {
                         }
                     }
                 }
-                boolean whoBet = false;
-                for (int i = 0; i < playersize; i++) {
-                    Action action = players.get((bigblind + i) % playersize).takeAction(currentBet, pot, communtiyCards, whoBet);
+                int currentindex =bigblind;
+                int lastplayerindex = (bigblind-1)%playersize;
+                boolean betend = false;
+                int allinnum=0;
+                do{
+                    Action action = players.get(currentindex).takeAction(currentBet, pot, communtiyCards);
                     switch (action) {
                         case Action.AllIn allIn -> {
-                            whoBet = true;
                             pot += allIn.chips();
                             if (currentBet < allIn.chips()) {
                                 currentBet = allIn.chips();
                             }
+                            lastplayerindex = currentindex;
                         }
                         case Action.Bet bet -> {
-                            whoBet = true;
                             currentBet = bet.chips();
                             pot += bet.chips();
+                            lastplayerindex = currentindex;
                         }
                         case Action.Raise raise->{
-
+                            currentBet = raise.chips();
+                            pot+= raise.chips();
+                            lastplayerindex = currentindex;
                         }
                         case Action.Call call -> {
                             pot += call.chips();
@@ -109,7 +115,22 @@ public class Game {
                         }
                     }
                     System.out.println("현재 팟 : "+pot);
-                }
+                    for(Player p : players){
+                        if(p.allined){
+                            allinnum++;
+                        }
+                        else if(p.folded){
+                            allinnum++;
+                        }
+                    }
+                    currentindex = (currentindex+1)%playersize;
+                    if(lastplayerindex == currentindex){
+                        betend = true;
+                    } else if (allinnum == playersize) {
+                        betend = true;
+                    }
+
+                }while(!betend);
                 if (communtiyCards.size() < 3) {
                     for (int i = 0; i < 3; i++) {
                         if (communtiyCards.size() < 3) {
@@ -149,6 +170,7 @@ public class Game {
                 int YN = sc.nextInt();
                 if(YN==0){
                     isplay=true;
+                    sc.next();
                     start();
                 }
             }

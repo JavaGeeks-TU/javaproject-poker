@@ -6,6 +6,7 @@ public abstract class Player {
     protected int chips;
     protected List<Card> holdCards = new ArrayList<>();
     protected boolean folded = false;
+    protected boolean allined = false;
     protected HandRank handRank;
 
     public void winner(int pot){chips+=pot;};
@@ -49,5 +50,5 @@ public abstract class Player {
 
     abstract void allIn();
 
-    abstract Action takeAction(int currentBet, int pot, List<Card> communityCards, boolean whoBet);
+    abstract Action takeAction(int currentBet, int pot, List<Card> communityCards);
 }

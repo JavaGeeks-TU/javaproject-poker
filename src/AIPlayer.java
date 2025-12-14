@@ -2,6 +2,7 @@ import java.util.*;
 
 public class AIPlayer extends Player {
     private static int num = 1;
+    private Random random = new Random();
 
     public AIPlayer(int chips) {
         this.name = "Computer " + num++;
@@ -9,24 +10,21 @@ public class AIPlayer extends Player {
     }
 
     @Override
-    public void bet(int amount) {
-        amount = Math.min(amount, chips);
-        deductChips(amount);
-        System.out.println(name+"가 " + amount + "을 Bet 했습니다.");
+    public void bet(int amount){
+        chips -=amount;
+        System.out.println(name + "이(가) " + amount + "을 Bet");
     }
 
     @Override
-    public void raise(int amount) {
-        amount = Math.min(amount, chips);
-        deductChips(amount);
-        System.out.println(name+"가 " + amount + "을 Raise 했습니다.");
+    public void raise(int amount){
+        chips -=amount;
+        System.out.println(name + "이(가) " + amount + "을 Raise");
     }
 
     @Override
     public void call(int amount) {
-        int callAmount = Math.min(amount, chips);
-        deductChips(callAmount);
-        System.out.println(name+"가 " + callAmount + "을 Call 했습니다.");
+        chips -=amount;
+        System.out.println(name+"가 " + amount + "을 Call 했습니다.");
     }
 
     @Override
@@ -36,10 +34,13 @@ public class AIPlayer extends Player {
 
     @Override
     public void allIn() {
+        allined =true;
         if(chips ==0){ System.out.println(name+"의 잔액이 없습니다. 넘어갑니다.");}
-        int amount = chips;
-        chips = 0;
-        System.out.println(name+"가  All-in! ( " + amount + " )");
+        else{
+            int amount = chips;
+            chips = 0;
+            System.out.println(name+"가  All-in! ( " + amount + " )");
+        }
     }
 
     //프리플랍 평가 함수
@@ -61,44 +62,50 @@ public class AIPlayer extends Player {
     }
 
     @Override
-    public Action takeAction(int currentBet, int pot, List<Card> communityCards, boolean whoBet) {
+    public Action takeAction(int currentBet, int pot, List<Card> communityCards) {
 
         try { Thread.sleep(900); } catch (Exception e) {}
 
         boolean preflop = communityCards.isEmpty();
 
         if (preflop) {
-            return decidePreflop(currentBet, whoBet);
+            return decidePreflop(currentBet);
         } else if(isFolded()){
             System.out.println(name+"폴드 했습니다.");
             return new Action.Fold();
-        } else if(chips ==0){
-            System.out.println("올인 했습니다.");
-            return new Action.AllIn(currentBet);
-        }
-        else {
-            return decidePostFlop(currentBet, communityCards, whoBet);
+        } else if(chips == 0 ){
+            System.out.println(name+"올인 했습니다.");
+            return new Action.AllIn(chips);
+        }else {
+            return decidePostFlop(currentBet, communityCards);
         }
     }
 
     //프리플랍 액션
-    private Action decidePreflop(int currentBet, boolean whoBet) {
+    private Action decidePreflop(int currentBet) {
         boolean strong = isStrongPreflopHand();
 
         if (strong) {
             // 강한 핸드
-            if (currentBet == 0 && !whoBet) {
+            if (currentBet == 0 ) {
+                if (chips <currentBet) {    allIn();  return new Action.AllIn(chips); }
                 // 아무도 베팅 안 함 → Bet (or Raise)
                 bet(30);
                 return new Action.Bet(30);
+            } else if (random.nextInt(100)<25) {
+                if(chips < currentBet*2){   allIn();    return new Action.AllIn(chips); }
+                raise(currentBet*2);
+                return new Action.Raise(currentBet*2);
             } else {
                 // 상대 Raise 있음 → Call
+                if (chips <currentBet) { allIn(); return new Action.AllIn(chips); }
                 call(currentBet);
                 return new Action.Call(currentBet);
             }
         } else {
             // 약한 핸드
-            if (currentBet != 0 && !whoBet) {
+            if (currentBet != 0) {
+                if (chips <currentBet) { allIn(); return new Action.AllIn(chips); }
                 call(currentBet);
                 return new Action.Call(currentBet);
             } else {
@@ -111,40 +118,43 @@ public class AIPlayer extends Player {
     }
 
     //포스트플랍 액션
-    private Action decidePostFlop(int currentBet, List<Card> community, boolean whoBet) {
+    private Action decidePostFlop(int currentBet, List<Card> community) {
 
         int handRank = evaluateHand(community);
 
         if (handRank >= 3) {
             // Two Pair 이상 → 공격적
             if (currentBet == 0) {
+                if (chips <currentBet) {    allIn();    return new Action.AllIn(chips); }
                 bet(40);
                 return new Action.Bet(40);
-            } else {
+            } else if (random.nextInt(100)<30) {
+                if(chips < currentBet*3){   allIn();    return new Action.AllIn(chips); }
+                raise(currentBet * 3);
+                return new Action.Raise(currentBet * 3);
+            }
+            else {
+                if (chips <currentBet) {    allIn();    return new Action.AllIn(chips); }
                 call(currentBet);
                 return new Action.Call(currentBet);
             }
         }
         else if (handRank >= 1) {
             // One Pair ~ Two Pair 사이 → 보통 공격
-            if (currentBet == 0 && !whoBet) {
-                check();
-                return new Action.Check();
-            } else {
-                call(currentBet);
-                return new Action.Call(currentBet);
+            if (currentBet == 0) {  check();    return new Action.Check();  }
+            else if (random.nextInt(100)<25) {
+                if(chips < currentBet*2){   allIn();    return new Action.AllIn(chips); }
+                raise(currentBet * 2);
+                 return new Action.Raise(currentBet * 2);
             }
+            else {
+                if (chips <currentBet) {    allIn();    return new Action.AllIn(chips); }
+                call(currentBet);   return new Action.Call(currentBet); }
         }
         else {
             // High card → 약함
-            if (currentBet == 0 && !whoBet) {
-                check();
-                return new Action.Check();
-            } else {
-                System.out.println(name+"폴드 했습니다.");
-                fold();
-                return new Action.Fold();
-            }
+            if (currentBet == 0) {  check();    return new Action.Check();  }
+            else {  System.out.println(name+"폴드 했습니다.");    fold(); return new Action.Fold();   }
         }
     }
 }
