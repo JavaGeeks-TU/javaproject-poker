@@ -35,12 +35,9 @@ public class AIPlayer extends Player {
     @Override
     public void allIn() {
         allined =true;
-        if(chips ==0){ System.out.println(name+"의 잔액이 없습니다. 넘어갑니다.");}
-        else{
             int amount = chips;
-            chips = 0;
             System.out.println(name+"가  All-in! ( " + amount + " )");
-        }
+
     }
 
     //프리플랍 평가 함수
@@ -75,7 +72,7 @@ public class AIPlayer extends Player {
             return new Action.Fold();
         } else if(chips == 0 ){
             System.out.println(name+"올인 했습니다.");
-            return new Action.AllIn(chips);
+            return new Action.Check();
         }else {
             return decidePostFlop(currentBet, communityCards);
         }

@@ -35,14 +35,9 @@ public class HumanPlayer extends Player {
     @Override
     public void allIn(){
         allined =true;
-        if(chips == 0){
-            System.out.println(name+"의 잔액이 없습니다. 넘어갑니다.");
-        }
-        else {
             int amount = chips;
-            chips = 0;
             System.out.println(name + "이(가) All-in( " + amount + " )");
-        }
+
     }
 
     @Override
@@ -53,7 +48,7 @@ public class HumanPlayer extends Player {
             return new Action.Fold();
         }
         else if(chips == 0){
-            return new Action.AllIn(chips);
+            return new Action.Check();
         }
         else {
             System.out.println("\n==== " + name + "의 턴 ====");

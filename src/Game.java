@@ -86,14 +86,31 @@ public class Game {
                 int lastplayerindex = (bigblind-1)%playersize;
                 boolean betend = false;
                 int allinnum=0;
+                int turnnum=0;
+                int allturnnum=0;
                 do{
-                    Action action = players.get(currentindex).takeAction(currentBet, pot, communtiyCards);
+                    Player p = players.get(currentindex);
+//                    if(allinnum ==0){
+//                        if(currentindex == bigblind){
+//                            currentBet = 20;
+//                        }
+//                        if(currentindex == smallblind){
+//                            currentBet = 10;
+//                        }
+//                    }
+                    if(turnnum==playersize){
+                        allinnum=0;
+                        turnnum =0;
+                        allturnnum++;
+                    }
+                    Action action = p.takeAction(currentBet, pot, communtiyCards);
                     switch (action) {
                         case Action.AllIn allIn -> {
                             pot += allIn.chips();
                             if (currentBet < allIn.chips()) {
                                 currentBet = allIn.chips();
                             }
+                            p.allinChips();
                             lastplayerindex = currentindex;
                         }
                         case Action.Bet bet -> {
@@ -114,16 +131,12 @@ public class Game {
                         case Action.Fold fold -> {
                         }
                     }
-                    System.out.println("현재 팟 : "+pot);
-                    for(Player p : players){
-                        if(p.allined){
-                            allinnum++;
-                        }
-                        else if(p.folded){
-                            allinnum++;
-                        }
+                    if(p.isFolded() || p.folded){
+                        allinnum++;
                     }
+                    System.out.println("현재 팟 : "+pot);
                     currentindex = (currentindex+1)%playersize;
+                    turnnum++;
                     if(lastplayerindex == currentindex){
                         betend = true;
                     } else if (allinnum == playersize) {
@@ -160,6 +173,11 @@ public class Game {
                 win.addChips(pot);
                 System.out.println(win.getName() + "가 이겼습니다.");
             }
+            for(int i=1;i<playersize;i++){
+                if(players.get(i).chips==0){
+                    players.get(i).addChips(1000);
+                }
+            }
             System.out.println("다음 라운드 진행합니다.\n\n");
             for (int i = 0; i < playersize; i++) {
                 players.get(i).newgame();
@@ -170,7 +188,7 @@ public class Game {
                 int YN = sc.nextInt();
                 if(YN==0){
                     isplay=true;
-                    sc.next();
+                    sc.nextLine();
                     start();
                 }
             }
@@ -188,9 +206,6 @@ public class Game {
             if(playerList.getFirst().getHandRank() == playerList.get(i).getHandRank()){
                 if(kicker.kicker(playerList.get(0).getHandRank()).getRank().getValue() < kicker.kicker(playerList.get(i).getHandRank()).getRank().getValue()){
                     winner = playerList.get(i);
-                }
-                else if(kicker.kicker(playerList.get(0).getHandRank()).getRank().getValue() == kicker.kicker(playerList.get(i).getHandRank()).getRank().getValue()){
-
                 }
             }
         }

@@ -23,6 +23,8 @@ public abstract class Player {
 
     public void addChips(int amount){ chips += amount; }
 
+    public void allinChips(){ chips =0; }
+
     public void deductChips(int amount){ chips -= amount; }
 
     public List<Card> getHoldCards(){ return holdCards; }
