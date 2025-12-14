@@ -2,7 +2,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Kicker {
-    public Card kikier(HandRank handRank) {
+    public Card kicker(HandRank handRank) {
         List<Card> cards = handRank.c();
         for(int i=0; i<handRank.rankcard().size();i++){
             if(handRank.rankcard().get(i) == handRank.c().get(i));{
