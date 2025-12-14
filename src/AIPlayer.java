@@ -12,7 +12,14 @@ public class AIPlayer extends Player {
     public void bet(int amount) {
         amount = Math.min(amount, chips);
         deductChips(amount);
-        System.out.println(name+"가 " + amount + "을 Bet/Raise 했습니다.");
+        System.out.println(name+"가 " + amount + "을 Bet 했습니다.");
+    }
+
+    @Override
+    public void raise(int amount) {
+        amount = Math.min(amount, chips);
+        deductChips(amount);
+        System.out.println(name+"가 " + amount + "을 Raise 했습니다.");
     }
 
     @Override
@@ -29,6 +36,7 @@ public class AIPlayer extends Player {
 
     @Override
     public void allIn() {
+        if(chips ==0){ System.out.println(name+"의 잔액이 없습니다. 넘어갑니다.");}
         int amount = chips;
         chips = 0;
         System.out.println(name+"가  All-in! ( " + amount + " )");
@@ -57,12 +65,16 @@ public class AIPlayer extends Player {
 
         try { Thread.sleep(900); } catch (Exception e) {}
 
-        boolean preflop = communityCards.size() == 0;
+        boolean preflop = communityCards.isEmpty();
 
         if (preflop) {
             return decidePreflop(currentBet, whoBet);
         } else if(isFolded()){
+            System.out.println(name+"폴드 했습니다.");
             return new Action.Fold();
+        } else if(chips ==0){
+            System.out.println("올인 했습니다.");
+            return new Action.AllIn(currentBet);
         }
         else {
             return decidePostFlop(currentBet, communityCards, whoBet);
@@ -75,7 +87,7 @@ public class AIPlayer extends Player {
 
         if (strong) {
             // 강한 핸드
-            if (currentBet == 0) {
+            if (currentBet == 0 && !whoBet) {
                 // 아무도 베팅 안 함 → Bet (or Raise)
                 bet(30);
                 return new Action.Bet(30);
@@ -87,10 +99,11 @@ public class AIPlayer extends Player {
         } else {
             // 약한 핸드
             if (currentBet != 0 && !whoBet) {
-                check();
-                return new Action.Check();
+                call(currentBet);
+                return new Action.Call(currentBet);
             } else {
                 // 상대가 Bet 했으면 Fold
+                System.out.println(name+"폴드 했습니다.");
                 fold();
                 return new Action.Fold();
             }
@@ -128,6 +141,7 @@ public class AIPlayer extends Player {
                 check();
                 return new Action.Check();
             } else {
+                System.out.println(name+"폴드 했습니다.");
                 fold();
                 return new Action.Fold();
             }

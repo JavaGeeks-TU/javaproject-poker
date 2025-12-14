@@ -34,6 +34,13 @@ public abstract class Player {
 
     public void fold(){ folded = true; }
 
+    public void newgame(){
+        this.folded = false;
+        this.holdCards.clear();
+    }
+
+    abstract void raise(int amount);
+
     abstract void bet(int amount);
 
     abstract void call(int amount);

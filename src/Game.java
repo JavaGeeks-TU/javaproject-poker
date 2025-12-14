@@ -47,10 +47,12 @@ public class Game {
     }
 
     public void play (){
+        players.add(player);
+        players.addAll(ais);
+        playersize = players.size();
+
         while(isplay) {
-            players.add(player);
-            players.addAll(ais);
-            playersize = players.size();
+            int foldcount =0;
             bigblind = (dealer + 2) % playersize;
             smallblind = (dealer + 1) % playersize;
             for (int i = 0; i < 2; i++) {
@@ -60,7 +62,25 @@ public class Game {
             }
             System.out.print("당신의 카드 : ");
             printCard.print(player.getHoldCards());
-            for (int j = 0; j < 4; j++) {
+
+            boolean gameFinishedFlag = false;
+
+            gameLoop: for (int j = 0; j < 4; j++) {
+                for(int i =0; i<playersize;i++){
+                    if(players.get(i).isFolded()) {
+                        foldcount++;
+                    }
+                }
+                if(foldcount == playersize-1){
+                    for(Player p : players){
+                        if(!p.isFolded()){
+                            System.out.println(p.getName()+"가 winner");
+                            p.addChips(pot);
+                            gameFinishedFlag = true;
+                            break gameLoop;
+                        }
+                    }
+                }
                 boolean whoBet = false;
                 for (int i = 0; i < playersize; i++) {
                     Action action = players.get((bigblind + i) % playersize).takeAction(currentBet, pot, communtiyCards, whoBet);
@@ -77,6 +97,9 @@ public class Game {
                             currentBet = bet.chips();
                             pot += bet.chips();
                         }
+                        case Action.Raise raise->{
+
+                        }
                         case Action.Call call -> {
                             pot += call.chips();
                         }
@@ -85,6 +108,7 @@ public class Game {
                         case Action.Fold fold -> {
                         }
                     }
+                    System.out.println("현재 팟 : "+pot);
                 }
                 if (communtiyCards.size() < 3) {
                     for (int i = 0; i < 3; i++) {
@@ -102,15 +126,23 @@ public class Game {
                     printCard.print(communtiyCards);
                 }
             }
-            for(int i=0;i<playersize;i++){
-                Player nowplayer = players.get(i);
-                System.out.print(nowplayer.name+" 카드 공개 : ");
-                printCard.print(nowplayer.getHoldCards());
-                nowplayer.setHandRank(rules.hankRank(nowplayer.getHoldCards(),communtiyCards));
-                System.out.println(nowplayer.getHandRank().handRanking().getName());
+
+            if (!gameFinishedFlag) {
+                for (int i = 0; i < playersize; i++) {
+                    Player nowplayer = players.get(i);
+                    System.out.print(nowplayer.name + " 카드 공개 : ");
+                    printCard.print(nowplayer.getHoldCards());
+                    nowplayer.setHandRank(rules.hankRank(nowplayer.getHoldCards(), communtiyCards));
+                    System.out.println(nowplayer.getHandRank().handRanking().getName());
+                }
+                Player win = winner(players);
+                win.addChips(pot);
+                System.out.println(win.getName() + "가 이겼습니다.");
             }
-            Player win = winner(players);
-            System.out.println(win.getName()+"가 이겼습니다. \n다음라운드로 넘어갑니다.");
+            System.out.println("다음 라운드 진행합니다.\n\n");
+            for (int i = 0; i < playersize; i++) {
+                players.get(i).newgame();
+            }
             if(player.chips==0){
                 isplay=false;
                 System.out.println("게임이 끝났습니다. 계속 하시겠습니까? YES[0],NO[1]");
@@ -134,6 +166,9 @@ public class Game {
             if(playerList.getFirst().getHandRank() == playerList.get(i).getHandRank()){
                 if(kicker.kicker(playerList.get(0).getHandRank()).getRank().getValue() < kicker.kicker(playerList.get(i).getHandRank()).getRank().getValue()){
                     winner = playerList.get(i);
+                }
+                else if(kicker.kicker(playerList.get(0).getHandRank()).getRank().getValue() == kicker.kicker(playerList.get(i).getHandRank()).getRank().getValue()){
+
                 }
             }
         }
